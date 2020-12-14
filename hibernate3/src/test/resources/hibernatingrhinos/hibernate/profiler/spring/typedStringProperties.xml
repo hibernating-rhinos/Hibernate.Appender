@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hprof="http://www.nhprof.com/schema/hprof"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                                           http://www.nhprof.com/schema/hprof http://www.nhprof.com/schema/hprof/hprof.xsd">
+       
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="annotatedClasses">
+          <list>
+            <value>hibernatingrhinos.hibernate.profiler.appender.entities.Simple</value>
+          </list>
+        </property>
+        <property name="hibernateProperties">
+            <value>
+                hibernate.dialect=org.hibernate.dialect.HSQLDialect
+                hibernate.cache.provider_class=org.hibernate.cache.HashtableCacheProvider
+                hibernate.cache.use_query_cache=true
+                hibernate.connection.driver_class=org.hsqldb.jdbcDriver
+                hibernate.connection.url=jdbc:hsqldb:mem:db
+                hibernate.connection.user=sa
+                hibernate.cache.use_second_level_cache=true
+                hibernate.jdbc.batch_size=50
+            </value>
+        </property>
+        <hprof:profiler init-on-startup="false" />
+    </bean>       
+                           
+ </beans>

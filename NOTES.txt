@@ -1,0 +1,76 @@
+Start of notes for docs:
+
+To install to JAR to local Maven repository:
+
+mvn install:install-file -DgroupId=hibernate.profiler -DartifactId=hibernate.profiler -Dversion=1.0 -Dpackaging=jar -Dfile=.\dist\hibernate-profiler-1.0.jar
+
+Getting Started:
+
+- Prequisites
+
+The profiler requires that you use Java 5.0 or greater, Hibernate 3.1 or greater, and Apache Log4j for logging.
+
+- Web applications
+
+If you are using Hibernate in a web application, you will need to add a listener to web.xml so that the profiler can associate a session with a web request.  The following needs to be added to web.xml:
+
+    <listener>
+        <listener-class>hibernatingrhinos.hibernate.profiler.web.HibernateProfilerListener</listener-class>
+    </listener>	
+
+This listener can be added before or after any other listener in the file.  You also need to add the configuration options below.
+
+- Log4j
+
+
+
+- Spring
+
+If you are using Hibernate with Spring 2.0 or greater, a namespace for the profiler is provided to ease integration.  In your Spring configuration file (often named applicationContext.xml), you must first add the namespace to the configuration:
+
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:hprof="http://www.nhprof.com/schema/hprof"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+                                           http://www.nhprof.com/schema/hprof http://www.nhprof.com/schema/hprof/hprof.xsd">
+
+</beans>
+
+
+Once the namespace has been added, add the configuration element to the your instance of LocalSessionFactoryBean or AnnotationSessionFactoryBean:
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+      ...
+      <property name="hibernateProperties">
+        <props>
+           ...
+        </props>
+      </property>
+      <hprof:profiler />
+    </bean>
+
+If you want to profile the application from a remote host, then specify the IP address of the host:
+
+      <hprof:profiler address="10.0.0.2" />
+
+This attribute handles the initialization and cleanup of the profiler, so no further configuration is necessary.
+
+- Hibernate
+
+If you are not using Spring, then you can configure the profiler directly by modifying the Hibernate configuration.  The following properties should be set in your Hibernate configuration file:
+
+<session-factory>
+  ...
+  <property name="cache.query_cache_factory">hibernatingrhinos.hibernate.profiler.cache.ProfilerQueryCacheFactory</property>
+  <property name="generate_statistics">true</property>
+</sessionFactory>
+
+If you have defined the property jdbc.batch_size to a number greater than zero, then you should also define the following property:
+
+<session-factory>
+  ...
+  <property name="jdbc.factory_class">hibernatingrhinos.hibernate.profiler.jdbc.ProfilerBatchingBatcherFactory</property>
+</session-factory>
+
+If you do not wish to enable stastics or are already using a custom batcher or query cache factory, then not enable these features will not prevent you from using the profiler.  However, there will be certain things that the profiler cannot detect or report on if these properties are not specified.
